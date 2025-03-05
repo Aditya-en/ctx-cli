@@ -5,7 +5,7 @@ from gitignore_parser import parse_gitignore
 from pathspec import PathSpec
 from pathspec.patterns.gitwildmatch import GitWildMatchPattern
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 def get_gitignore_matchers(root_dir):
     matchers = []
@@ -50,8 +50,9 @@ def generate_tree_lines(nodes, prefix=''):
 
 def main():
     parser = argparse.ArgumentParser(description='Generate codebase context for LLMs')
-    parser.add_argument('files', nargs='*', help='Files or directories to include')
-    parser.add_argument('--no-tree', action='store_true', help='Skip file tree structure')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--no-tree', action='store_true', help='Skip file tree structure')
+    group.add_argument('--tree', action='store_true', help='Show ONLY the tree structure')
     parser.add_argument('--ignore', action='append', default=[], help='Custom ignore patterns')
     parser.add_argument('-f', '--file', metavar='PATH', 
                        help='Save output to specified file')
@@ -118,22 +119,25 @@ def main():
 
     output = []
 
-    if not args.no_tree:
+    # Tree generation
+    if not args.no_tree or args.tree:
         sorted_root = sorted(dir_structure.items(), key=lambda x: x[0])
         tree_lines = generate_tree_lines(sorted_root)
         output.append("File structure:\n.")
         output.extend(tree_lines)
-        output.append("\nFile contents:\n")
+        output.append("")
 
-    for file_path in collected_files:
-        rel_path = os.path.relpath(file_path, root_dir)
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-            output.append(f"--- {rel_path} ---\n{content}\n")
-        except Exception as e:
-            print(f"Error reading '{rel_path}': {e}", file=sys.stderr)
-
+    # File contents (only if not --tree)
+    if not args.tree:
+        output.append("\nFile contents:\n" if not args.no_tree else "")
+        for file_path in collected_files:
+            rel_path = os.path.relpath(file_path, root_dir)
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                output.append(f"--- {rel_path} ---\n{content}\n")
+            except Exception as e:
+                print(f"Error reading '{rel_path}': {e}", file=sys.stderr)
     
     output_str = '\n'.join(output)
     # File output

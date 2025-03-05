@@ -1,8 +1,11 @@
 from setuptools import setup, find_packages
+import re
+with open("ctx/cli.py") as f:
+    version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 setup(
     name="ctx-cli",
-    version="0.2.0",
+    version=version,
     packages=find_packages(),
     install_requires=[
         'gitignore-parser',
