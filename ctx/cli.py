@@ -20,6 +20,8 @@ def get_gitignore_matchers(root_dir):
 
 def is_ignored_by_gitignore(file_path, gitignore_matchers):
     file_abs = os.path.abspath(file_path)
+    if ".git" in file_abs.split(os.sep):
+        return True
     for base_dir, match_fn in gitignore_matchers:
         if file_abs.startswith(base_dir):
             rel_path = os.path.relpath(file_abs, base_dir)
