@@ -5,7 +5,7 @@ from gitignore_parser import parse_gitignore
 from pathspec import PathSpec
 from pathspec.patterns.gitwildmatch import GitWildMatchPattern
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 def get_gitignore_matchers(root_dir):
     matchers = []
@@ -53,9 +53,12 @@ def main():
     parser.add_argument('files', nargs='*', help='Files or directories to include')
     parser.add_argument('--no-tree', action='store_true', help='Skip file tree structure')
     parser.add_argument('--ignore', action='append', default=[], help='Custom ignore patterns')
+    parser.add_argument('-f', '--file', metavar='PATH', 
+                       help='Save output to specified file')
+    parser.add_argument('-c', '--clipboard', action='store_true',
+                       help='Copy output to clipboard')
     parser.add_argument('-v', '--version', action='version', 
-                       version=f'%(prog)s {__version__}',
-                       help='Show version and exit')
+                       version=f'%(prog)s {__version__}')
     
     args = parser.parse_args()
 
@@ -131,7 +134,34 @@ def main():
         except Exception as e:
             print(f"Error reading '{rel_path}': {e}", file=sys.stderr)
 
-    print('\n'.join(output))
+    
+    output_str = '\n'.join(output)
+    # File output
+    if args.file:
+        try:
+            with open(args.file, 'w', encoding='utf-8') as f:
+                f.write(output_str)
+            print(f"Output saved to {os.path.abspath(args.file)}", file=sys.stderr)
+        except Exception as e:
+            print(f"Error writing to file: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    # Clipboard handling
+    if args.clipboard:
+        try:
+            import pyperclip
+            pyperclip.copy(output_str)
+            print("Output copied to clipboard 📋", file=sys.stderr)
+        except ImportError:
+            print("Clipboard feature requires pyperclip. Install with: pip install pyperclip", 
+                  file=sys.stderr)
+            sys.exit(1)
+        except Exception as e:
+            print(f"Clipboard error: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    if not args.file or args.clipboard:
+        print(output_str)
 
 if __name__ == '__main__':
     main()
