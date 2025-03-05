@@ -21,7 +21,7 @@ setup(
             'ctx = ctx.cli:main'
         ]
     },
-    author="Your Name",
+    author="Aditya Sahani",
     description="CLI tool to generate codebase context for LLMs",
     long_description=long_description,
     long_description_content_type="text/markdown",

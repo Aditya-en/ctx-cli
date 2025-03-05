@@ -5,15 +5,13 @@
 
 A CLI tool to generate consolidated codebase context for LLMs with intelligent file handling and structure visualization.
 
-<!-- ![Example Output](https://via.placeholder.com/800x400.png?text=CTX+Output+Example+-+File+Tree+%2B+File+Contents) -->
-
 ## Features ✨
 
 - **Smart Ignore System** 🔒  
-  - Auto-detects `.gitignore` rules + custom ignores via `--ignore`
-  - Ignores `.git` folder by default to reduce clutter
+  - Auto-detects .gitignore rules + custom ignores via --ignore
+  - Ignores .git folder by default to reduce clutter
 - **File Tree Visualization** 🌳  
-  - Built-in directory structure display (disable with `--no-tree`)
+  - Built-in directory structure display (disable with --no-tree)
 - **Flexible Targeting** 🎯  
   - Specify files/directories or process the entire project
 - **LLM-Optimized** 🤖  
@@ -51,28 +49,38 @@ ctx --ignore "*.log" --ignore tmp/ --no-tree
 ## Advanced Options ⚙️
 
 | Option          | Description                                     | Example                    |
-|----------------|---------------------------------|--------------------------|
-| `--ignore`     | Add custom ignore pattern (glob format) | `--ignore "*.csv"`     |
-| `--no-tree`    | Disable file tree visualization | `--no-tree`             |
-| `--output`     | Save output to file | `--output context.txt` |
-| `--version`    | Show version information | `--version`             |
+|----------------|-------------------------------------------------|----------------------------|
+| --max-tokens   | Set maximum context size in tokens              | --max-tokens 100000        |
+| --auto-skip    | Automatically skip large files                  | --auto-skip                |
+| --ignore       | Add custom ignore pattern (glob format)         | --ignore "*.csv"           |
+| --no-tree      | Disable file tree visualization                 | --no-tree                  |
+| --tree         | Show ONLY the file tree structure               | --tree                     |
+| --output, -f   | Save output to file                             | --output context.txt       |
+| -c, --clipboard| Copy output to clipboard                        | --clipboard                |
+| --version, -v  | Show version information                        | --version                  |
 
 ## Example Output 📄
-```
-File structure:
-.
-├── README.md
-├── ctx/
-│   ├── __init__.py
-│   └── cli.py
-└── setup.py
 
-File contents:
+The tool generates a consolidated view of your project, including:
+- A hierarchical file tree structure
+- Full contents of processed files
+- Warning messages for large files
+- Optional clipboard and file output
 
---- README.md ---
-# CTX - Codebase Context Generator
+## Token Estimation and File Handling
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/badge/python-3.6%2B-blue.svg)](https://www.python.org/)
+- Uses a conservative token estimation method
+- Provides interactive prompts for large files
+- Configurable maximum token limit (default: 128,000 tokens)
+- Supports custom ignore patterns and .gitignore rules
 
-A CLI tool to generate consolidated codebase context for LLMs with intelligent file handling and structure visualization.
+## Dependencies
+- gitignore-parser
+- pathspec
+- pyperclip (optional, for clipboard feature)
+
+## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+This project is licensed under the MIT License.
