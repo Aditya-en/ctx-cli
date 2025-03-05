@@ -5,6 +5,8 @@ from gitignore_parser import parse_gitignore
 from pathspec import PathSpec
 from pathspec.patterns.gitwildmatch import GitWildMatchPattern
 
+__version__ = "0.1.1"
+
 def get_gitignore_matchers(root_dir):
     matchers = []
     for dirpath, dirnames, filenames in os.walk(root_dir):
@@ -20,8 +22,10 @@ def get_gitignore_matchers(root_dir):
 
 def is_ignored_by_gitignore(file_path, gitignore_matchers):
     file_abs = os.path.abspath(file_path)
-    if ".git" in file_abs.split(os.sep):
+    
+    if any(part == '.git' for part in file_abs.split(os.sep)):
         return True
+    
     for base_dir, match_fn in gitignore_matchers:
         if file_abs.startswith(base_dir):
             rel_path = os.path.relpath(file_abs, base_dir)
@@ -45,10 +49,14 @@ def generate_tree_lines(nodes, prefix=''):
     return lines
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate a consolidated context of the codebase for LLMs.')
+    parser = argparse.ArgumentParser(description='Generate codebase context for LLMs')
     parser.add_argument('files', nargs='*', help='Files or directories to include')
-    parser.add_argument('--no-tree', action='store_true', help='Skip the file tree structure')
+    parser.add_argument('--no-tree', action='store_true', help='Skip file tree structure')
     parser.add_argument('--ignore', action='append', default=[], help='Custom ignore patterns')
+    parser.add_argument('-v', '--version', action='version', 
+                       version=f'%(prog)s {__version__}',
+                       help='Show version and exit')
+    
     args = parser.parse_args()
 
     root_dir = os.getcwd()
